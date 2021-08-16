@@ -6,7 +6,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.jdbc.core.JdbcTemplate;
-import stabbers.parserdb.dbSerializer.DbJsonSerializer;
+import stabbers.parserdb.service.DbService;
+import stabbers.parserdb.serializer.DbJsonSerializer;
 
 @SpringBootApplication
 public class ParserDbApplication implements CommandLineRunner {
@@ -24,8 +25,8 @@ public class ParserDbApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        DbJsonSerializer serializer = new DbJsonSerializer(jdbcTemplate);
-        serializer.serialize("test_structure.json");
+        DbService serializer = new DbService(jdbcTemplate);
+        DbJsonSerializer.serialize(serializer.getDb());
         log.info("Sterilization is completed");
     }
 

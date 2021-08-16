@@ -1,24 +1,30 @@
-package stabbers.parserdb.dbSerializer;
+package stabbers.parserdb.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import stabbers.parserdb.entity.*;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-public class DbJsonSerializer {
+public class DbService {
     private final JdbcTemplate jdbcTemplate;
     private final Database db;
 
-    public DbJsonSerializer(JdbcTemplate jdbcTemplate) {
+    public DbService(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        db = new Database("test", getTables());
+        db = new Database(getDbName(), getTables());
+    }
+
+    public Database getDb(){
+        return db;
+    }
+
+    private String getDbName(){
+            return jdbcTemplate.queryForObject(
+                            "SELECT current_database();",
+                    (rs, rn) -> rs.getString("current_database")
+            );
     }
 
     private LinkedList<Table> getTables() {
@@ -42,7 +48,8 @@ public class DbJsonSerializer {
 
     private String getTableComment(String table_name) {
         try {
-            return jdbcTemplate.queryForObject("SELECT obj_description(oid) \"comment\"\n" +
+            return jdbcTemplate.queryForObject(
+                    "SELECT obj_description(oid) \"comment\"\n" +
                             "FROM pg_class\n" +
                             "WHERE relkind = 'r' AND relname = ?;",
                     (rs, rn) -> rs.getString("comment"),
@@ -99,14 +106,5 @@ public class DbJsonSerializer {
                         rs.getString("foreign_table_name"), rs.getString("foreign_column_name")),
                 table_name
         ));
-    }
-
-    public void serialize(String path) {
-        ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
-        try (BufferedWriter file = new BufferedWriter(new FileWriter(path))) {
-            mapper.writeValue(file, db);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
     }
 }
