@@ -1,4 +1,4 @@
-# Утилита запаковывает структуру базы данных в JSON
+# This utility packages the database structure in JSON
 
 ## Build jar
 `mvn -Dmaven.test.skip=true install`
