@@ -3,8 +3,7 @@ package stabbers.parserdb.entity;
 import lombok.Data;
 
 @Data
-public class Column {
+public class ColumnComment {
     private final String column_name;
-    private final String data_type;
-    private String column_comment;
+    private final String comment;
 }
