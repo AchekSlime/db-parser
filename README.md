@@ -4,5 +4,5 @@
 mvn -Dmaven.test.skip=true install
 
 ## Run
-java -jar parserDB-0.0.1.jar --spring.datasource.url=<url> --spring.datasource.username=<username> --spring.datasource.password=<password>
-where you should change <url>, <username>, <password> to your params without triangular brackets
+java -jar parserDB-0.0.1.jar --spring.datasource.url=&lt;url&gt; --spring.datasource.username=&lt;username&gt; --spring.datasource.password=&lt;password&gt;
+where you should change &lt;url&gt;, &lt;username&gt;, &lt;password&gt; to your params without triangular brackets
