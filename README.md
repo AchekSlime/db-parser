@@ -1,7 +1,7 @@
 # Утилита запаковывает структуру базы данных в JSON
 
 ## Build jar
-* 'mvn -Dmaven.test.skip=true install'
+* `mvn -Dmaven.test.skip=true install`
 
 ## Run
 * java -jar parserDB-0.0.1.jar --spring.datasource.url=&lt;url&gt; --spring.datasource.username=&lt;username&gt; --spring.datasource.password=&lt;password&gt;"
