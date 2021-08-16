@@ -1,4 +1,4 @@
-# This utility packages the database structure in JSON
+#  packages the database structure in JSON
 
 ## Build jar
 `mvn -Dmaven.test.skip=true install`
