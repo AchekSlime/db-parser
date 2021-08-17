@@ -1,7 +1,7 @@
 #  packages the database structure in JSON
 
 ## Build jar
-Execute `./mvnw -Dmaven.test.skip=true install` repository root folder
+Execute `./mvnw -Dmaven.test.skip=true install` in repository root folder
 
 ## Run
 `java -jar db-parser-0.0.1.jar --spring.datasource.url=<url> --spring.datasource.username=<username> --spring.datasource.password=<password>`
