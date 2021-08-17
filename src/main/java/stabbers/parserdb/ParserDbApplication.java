@@ -31,7 +31,8 @@ public class ParserDbApplication implements CommandLineRunner {
         dbService.configure();
         // Сериализуем полученную структуру из сущностей в JSON.
         DbJsonSerializer.serialize(dbService.getDb());
-        log.info("Sterilization is completed");
+
+        log.info("...Serialization is completed...");
     }
 
 
