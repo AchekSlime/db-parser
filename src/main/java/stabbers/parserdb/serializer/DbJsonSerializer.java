@@ -11,7 +11,7 @@ import java.io.IOException;
 public class DbJsonSerializer
 {
     /**
-     * Static method, that generates a JSON file
+     * Static method that generates a JSON file
      * @param db the database to be sterilized
      */
     public static void serialize(Database db) {

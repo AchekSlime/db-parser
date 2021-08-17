@@ -12,13 +12,21 @@ public class DbService {
     private final Database db;
 
     /**
-     * Constructs a DvService in which the database instance is initialized and its entire structure is obtained
+     * Constructs a DbService with database "db" and jdbcTemplate initialization
      * @param jdbcTemplate the jdbcTemplate instance through which queries to the database will be executed
      * @exception org.springframework.dao.DataAccessException while sql query execution in getTables()
      */
     public DbService(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        db = new Database(getDbName(), getTables());
+        db = new Database("lol", null);
+    }
+
+    /**
+     * Retrieves the entire database structure
+     */
+    public void configure(){
+        db.setDb_name(getDbName());
+        db.setTables(getTables());
     }
 
     /**

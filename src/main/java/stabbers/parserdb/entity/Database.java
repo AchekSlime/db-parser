@@ -1,11 +1,13 @@
 package stabbers.parserdb.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@AllArgsConstructor
 public class Database {
-    private final String db_name;
-    private final List<Table> tables;
+    private String db_name;
+    private List<Table> tables;
 }
