@@ -25,7 +25,11 @@ public class ParserDbApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        // Создаем инстанц класса, который вытянет структуру бд и замапит ее в сущности.
+        // После того, как вызовется конструктор, вся структура будет получена.
         DbService serializer = new DbService(jdbcTemplate);
+
+        // Сериализуем полученную структуру из сущностей в JSON.
         DbJsonSerializer.serialize(serializer.getDb());
         log.info("Sterilization is completed");
     }

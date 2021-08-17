@@ -11,15 +11,26 @@ public class DbService {
     private final JdbcTemplate jdbcTemplate;
     private final Database db;
 
+    /**
+     * Constructs a DvService in which the database instance is initialized and its entire structure is obtained
+     * @param jdbcTemplate the jdbcTemplate instance through which queries to the database will be executed
+     * @exception org.springframework.dao.DataAccessException while sql query execution in getTables()
+     */
     public DbService(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         db = new Database(getDbName(), getTables());
     }
 
+    /**
+     * @return configured database instance with all entire structure
+     */
     public Database getDb(){
         return db;
     }
 
+    /**
+     * @return database name obtained by jdbcTemplate query
+     */
     private String getDbName(){
             return jdbcTemplate.queryForObject(
                             "SELECT current_database();",
@@ -27,6 +38,10 @@ public class DbService {
             );
     }
 
+    /**
+     * Gets all tables with their internal structure
+     * @return List of configured Tables with their entire structure
+     */
     private LinkedList<Table> getTables() {
         LinkedList<Table> tables = new LinkedList<>(jdbcTemplate.query(
                 "SELECT table_name\n" +
@@ -36,9 +51,12 @@ public class DbService {
         ));
 
         tables.forEach(table -> {
+            // Getting all the commented columns in current Table.
             HashMap<String, String> columnComments = getColumnComments(table.getTable_name());
+            // Setting the table comment.
             table.setTable_comment(getTableComment(table.getTable_name()));
             table.setColumns(getColumns(table.getTable_name()));
+            // Setting comments for each column in current table.
             table.getColumns().forEach(column -> column.setColumn_comment(columnComments.get(column.getColumn_name())));
             table.setForeignKeys(getForeignKeys(table.getTable_name()));
         });
@@ -46,6 +64,11 @@ public class DbService {
         return tables;
     }
 
+    /**
+     * Gets comment of table
+     * @param table_name name of the requested table
+     * @return comment of the requested table
+     */
     private String getTableComment(String table_name) {
         try {
             return jdbcTemplate.queryForObject(
@@ -60,6 +83,11 @@ public class DbService {
         }
     }
 
+    /**
+     * Gets all columns for requested table
+     * @param table_name name of the requested table
+     * @return column List for requested table
+     */
     private LinkedList<Column> getColumns(String table_name) {
         return new LinkedList<>(jdbcTemplate.query(
                 "SELECT column_name, data_type\n" +
@@ -70,6 +98,11 @@ public class DbService {
         );
     }
 
+    /**
+     * Gets all column_comments in the form of Map
+     * @param table_name name of the requested table
+     * @return Map<column_name, column_comment></> for requested table
+     */
     private HashMap<String, String> getColumnComments(String table_name) {
         HashMap<String, String> comments = new HashMap<>();
         LinkedList<ColumnComment> commentsList = new LinkedList<>(jdbcTemplate.query(
@@ -86,6 +119,11 @@ public class DbService {
         return comments;
     }
 
+    /**
+     * Gets all foreign keys constraints for requested table
+     * @param table_name ame of the requested table
+     * @return ForeignKey list with their structure
+     */
     private LinkedList<ForeignKey> getForeignKeys(String table_name) {
         return new LinkedList<>(jdbcTemplate.query(
                 "SELECT \n" +
