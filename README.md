@@ -8,4 +8,4 @@ Execute `./mvnw -Dmaven.test.skip=true install` repository root folder
 <br /><br />where you should change &lt;url&gt;, &lt;username&gt;, &lt;password&gt; to your params without triangular brackets
 
 ## Result
-file `<database name>_structure.json` file will be generated near the `.jar` file
+`<database name>_structure.json` file will be generated near the `.jar` file
