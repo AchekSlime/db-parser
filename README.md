@@ -2,7 +2,7 @@
 
 ## Build jar
 Execute `./mvnw -Dmaven.test.skip=true install` command in repository root folder
-<br />Or ou can find the built `db-parser-0.0.1.jar` in the `jar` folder lol
+<br />Or ou can find the built `db-parser-0.0.1.jar` in the `jar` folder
 
 ## Run
 Execute `java -jar db-parser-0.0.1.jar --spring.datasource.url=<url> --spring.datasource.username=<username> --spring.datasource.password=<password>` command near the `.jar` file
