@@ -1,0 +1,8 @@
+spring:
+  datasource:
+      db_name: test
+      url: jdbc:postgresql://localhost:5432/${spring.datasource.db_name}
+      username: achek
+      password: impsstabb
+serializer:
+  path: "${spring.datasource.db_name}_db_structure.json"

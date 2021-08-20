@@ -16,16 +16,16 @@ public class DbService {
      * @param jdbcTemplate the jdbcTemplate instance through which queries to the database will be executed
      * @exception org.springframework.dao.DataAccessException while sql query execution in getTables()
      */
-    public DbService(JdbcTemplate jdbcTemplate) {
+    public DbService(JdbcTemplate jdbcTemplate, String dbName) {
         this.jdbcTemplate = jdbcTemplate;
-        db = new Database("lol", null);
+        db = new Database(dbName, null);
     }
 
     /**
      * Retrieves the entire database structure
      */
     public void configure(){
-        db.setDb_name(getDbName());
+        //db.setDb_name(getDbName());
         db.setTables(getTables());
     }
 
@@ -36,15 +36,15 @@ public class DbService {
         return db;
     }
 
-    /**
-     * @return database name obtained by jdbcTemplate query
-     */
-    private String getDbName(){
-            return jdbcTemplate.queryForObject(
-                            "SELECT current_database();",
-                    (rs, rn) -> rs.getString("current_database")
-            );
-    }
+//    /**
+//     * @return database name obtained by jdbcTemplate query
+//     */
+//    private String getDbName(){
+//            return jdbcTemplate.queryForObject(
+//                            "SELECT current_database();",
+//                    (rs, rn) -> rs.getString("current_database")
+//            );
+//    }
 
     /**
      * Gets all tables with their internal structure

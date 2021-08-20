@@ -14,10 +14,11 @@ public class DbJsonSerializer
      * Static method that generates a JSON file
      * @param db the database to be sterilized
      */
-    public static void serialize(Database db) {
+    public static void serialize(Database db, String path) {
         ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         // Поток ввода для файла с именем "<db_name>_structure.json".
-        try (BufferedWriter file = new BufferedWriter(new FileWriter(db.getDb_name() + "_structure.json"))) {
+        //try (BufferedWriter file = new BufferedWriter(new FileWriter(db.getDb_name() + "_structure.json"))) {
+        try (BufferedWriter file = new BufferedWriter(new FileWriter(path))) {
             mapper.writeValue(file, db);
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
