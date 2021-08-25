@@ -5,4 +5,4 @@ spring:
       username: achek
       password: impsstabb
 serializer:
-  path: "${spring.datasource.db_name}_db_structure.json"
+  path: "${spring.datasource.db_name}_db_structure"

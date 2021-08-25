@@ -9,8 +9,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.jdbc.core.JdbcTemplate;
 import stabbers.parserdb.config.DataSourceConfig;
 import stabbers.parserdb.config.SerializerConfig;
+import stabbers.parserdb.serializer.PlantumlSerializer;
 import stabbers.parserdb.service.DbService;
-import stabbers.parserdb.serializer.DbJsonSerializer;
+import stabbers.parserdb.serializer.JsonSerializer;
 
 @SpringBootApplication
 public class ParserDbApplication implements CommandLineRunner {
@@ -37,8 +38,11 @@ public class ParserDbApplication implements CommandLineRunner {
         DbService dbService = new DbService(jdbcTemplate, dConfig.getDb_name());
         // Подтягиваем всю структуру бд.
         dbService.configure();
+
         // Сериализуем полученную структуру из сущностей в JSON.
-        DbJsonSerializer.serialize(dbService.getDb(), sConfig.getPath());
+        JsonSerializer.serialize(dbService.getDb(), sConfig.getPath() + ".json");
+        // Сериализуем в PlantUML
+        PlantumlSerializer.serialize(dbService.getDb(), sConfig.getPath() + "[plant].txt");
 
         log.info("...Serialization is completed...");
     }

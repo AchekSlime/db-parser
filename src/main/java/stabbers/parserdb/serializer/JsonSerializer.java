@@ -8,7 +8,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class DbJsonSerializer
+public class JsonSerializer
 {
     /**
      * Static method that generates a JSON file
