@@ -1,4 +1,5 @@
-#  packages the database structure to JSON
+#[СТАРЫЙ README]  
+# packages the database structure to JSON
 
 ## Build jar
 Execute `./mvnw -Dmaven.test.skip=true install` command in repository root folder
