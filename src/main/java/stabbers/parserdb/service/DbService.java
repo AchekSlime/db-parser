@@ -54,7 +54,7 @@ public class DbService {
         LinkedList<Table> tables = new LinkedList<>(jdbcTemplate.query(
                 "SELECT table_name\n" +
                         "FROM information_schema.tables\n" +
-                        "WHERE table_schema='public' AND table_type='BASE TABLE';",
+                        "WHERE table_schema='rbac';",
                 (rs, rn) -> new Table(rs.getString("table_name"))
         ));
 

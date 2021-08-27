@@ -1,9 +1,9 @@
 spring:
   datasource:
-      db_name: test
+      db_name: ib
       url: jdbc:postgresql://localhost:5432/${spring.datasource.db_name}
-      username: achek
-      password: impsstabb
+      username: postgres
+      password: admin
 serializer:
   pathJson: "${spring.datasource.db_name}_db_structure.json"
   pathPlantuml: "${spring.datasource.db_name}_db_structure.png"
