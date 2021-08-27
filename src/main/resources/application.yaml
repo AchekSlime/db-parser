@@ -1,12 +1,15 @@
 spring:
   datasource:
       db_name: ib
+      schema_name : rbc
       url: jdbc:postgresql://localhost:5432/${spring.datasource.db_name}
       username: postgres
       password: admin
 serializer:
-  pathJson: "${spring.datasource.db_name}_db_structure.json"
-  pathPlantuml: "${spring.datasource.db_name}_db_structure.txt"
+  pathToFolder: ""
+  pathJson: "${serializer.pathToFolder}${spring.datasource.db_name}-${spring.datasource.schema_name}-meta.json"
+  pathPng: "${serializer.pathToFolder}${spring.datasource.db_name}-${spring.datasource.schema_name}-meta.png"
+  pathTxt: "${serializer.pathToFolder}${spring.datasource.db_name}-${spring.datasource.schema_name}-meta.txt"
   umlInit : "@startuml\nleft to right direction\n
             !define foreign_key(x) <color:#aaaaaa><&key></color> x\n
             !define primary_key(x) <b><color:#b8861b><&key></color> x<b>\n

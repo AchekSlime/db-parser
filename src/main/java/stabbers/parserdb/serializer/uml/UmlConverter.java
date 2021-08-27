@@ -4,10 +4,6 @@ import stabbers.parserdb.entity.Column;
 import stabbers.parserdb.entity.Database;
 import stabbers.parserdb.entity.Table;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-
 public class UmlConverter {
     private final StringBuilder foreignKeys;
     private static final String umlInit = "@startuml\nleft to right direction\n" +
@@ -22,10 +18,20 @@ public class UmlConverter {
         foreignKeys = new StringBuilder();
     }
 
+    /**
+     * Return database structure in the uml syntax as a string
+     * @param db requested database
+     * @return string - database structure in uml
+     */
     public String getString(Database db){
         return umlInit + serializeTables(db) + foreignKeys + "@enduml";
     }
 
+    /**
+     * Returns all tables in the uml syntax as a string
+     * @param db requested database
+     * @return string - tables in uml syntax
+     */
     private String serializeTables(Database db){
         StringBuilder stb = new StringBuilder();
         db.getTables().forEach(table -> {
@@ -39,6 +45,11 @@ public class UmlConverter {
         return stb.toString();
     }
 
+    /**
+     * Returns all columns of requested table in the uml syntax as a string
+     * @param table requested table
+     * @return string - columns in uml syntax
+     */
     private String serializeColumns(Table table) {
         StringBuilder stb = new StringBuilder();
         String indent = "  ";
@@ -51,6 +62,11 @@ public class UmlConverter {
         return stb.toString();
     }
 
+    /**
+     * Defines the format for the column depending on the constraints
+     * @param column requested column
+     * @return string - uml column name
+     */
     private String getColumnType(Column column){
         if(column.getConstraints() == null)
             return "column( " + column.getColumn_name() + " )";
@@ -62,6 +78,10 @@ public class UmlConverter {
             return "*" + column.getColumn_name();
     }
 
+    /**
+     * Adds the foreignKeys of the requested table to the global db relationships
+     * @param table requested table
+     */
     private void serializeTableFK(Table table){
         table.getForeignKeys().forEach(fk -> {
             foreignKeys.append(fk.getTable_name()).append("::").append(fk.getColumn_name());
@@ -69,21 +89,5 @@ public class UmlConverter {
             foreignKeys.append(fk.getForeign_table_name()).append("::").append(fk.getForeign_column_name()).append(" : ").append(fk.getColumn_name());
             foreignKeys.append("\n");
         });
-    }
-
-    public void serialize(Database db, String path) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(path))) {
-            bw.write("@startuml\n!theme plain\nleft to right direction\n" +
-                "!define primary_key(x) <b><color:#b8861b><&key></color> x<b>\n" +
-                "!define foreign_key(x) <color:#aaaaaa><&key></color> x\n" +
-                "!define column(x) <color:#000000><&media-record></color> x\n" +
-                "!define table(x) entity x << (T, white) >> " +
-                    "\n\n");
-            bw.write(serializeTables(db));
-            bw.write(foreignKeys.toString());
-            bw.write("@enduml");
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
     }
 }

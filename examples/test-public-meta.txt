@@ -1,0 +1,26 @@
+@startuml
+left to right direction
+!define foreign_key(x) <color:#aaaaaa><&key></color> x
+!define primary_key(x) <b><color:#b8861b><&key></color> x<b>
+!define column(x) <color:#000000><&media-record></color> x
+!define heap_column(x) <color:#808080><&media-record></color> x
+!define table(x) entity x << (T, white) >> 
+
+table( role ) { 
+  primary_key( id ) : integer "КОММЕНТАРИЙ-2"
+  column( name ) : character varying "КОММЕНТАРИЙ-2"
+  --
+heap_column( table comment ) : It is role table
+}
+
+table( student ) { 
+  primary_key( id ) : integer
+  foreign_key( role_id ) : integer
+  column( login ) : character varying
+  column( password ) : character varying
+  --
+heap_column( table comment ) : It is student table
+}
+
+student::role_id }o--|| role::id : role_id
+@enduml

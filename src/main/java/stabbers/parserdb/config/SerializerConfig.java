@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "serializer")
 public class SerializerConfig {
     private String pathJson;
-    private String pathPlantuml;
-    private String umlInit;
+    private String pathPng;
+    private String pathTxt;
 }
 

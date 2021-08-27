@@ -1,0 +1,49 @@
+{
+  "db_name" : "test",
+  "tables" : [ {
+    "table_name" : "role",
+    "table_comment" : "It is role table",
+    "columns" : [ {
+      "column_name" : "id",
+      "data_type" : "integer",
+      "constraints" : "p",
+      "column_comment" : "КОММЕНТАРИЙ-2"
+    }, {
+      "column_name" : "name",
+      "data_type" : "character varying",
+      "constraints" : null,
+      "column_comment" : "КОММЕНТАРИЙ-2"
+    } ],
+    "foreignKeys" : [ ]
+  }, {
+    "table_name" : "student",
+    "table_comment" : "It is student table",
+    "columns" : [ {
+      "column_name" : "id",
+      "data_type" : "integer",
+      "constraints" : "p",
+      "column_comment" : null
+    }, {
+      "column_name" : "role_id",
+      "data_type" : "integer",
+      "constraints" : "f",
+      "column_comment" : null
+    }, {
+      "column_name" : "login",
+      "data_type" : "character varying",
+      "constraints" : null,
+      "column_comment" : null
+    }, {
+      "column_name" : "password",
+      "data_type" : "character varying",
+      "constraints" : null,
+      "column_comment" : null
+    } ],
+    "foreignKeys" : [ {
+      "table_name" : "student",
+      "column_name" : "role_id",
+      "foreign_table_name" : "role",
+      "foreign_column_name" : "id"
+    } ]
+  } ]
+}

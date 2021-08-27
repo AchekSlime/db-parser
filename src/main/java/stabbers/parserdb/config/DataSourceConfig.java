@@ -12,4 +12,5 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "spring.datasource")
 public class DataSourceConfig {
     private String db_name;
+    private String schema_name;
 }

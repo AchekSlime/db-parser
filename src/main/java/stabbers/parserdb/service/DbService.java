@@ -10,22 +10,23 @@ import java.util.LinkedList;
 public class DbService {
     private final JdbcTemplate jdbcTemplate;
     private final Database db;
+    private final String schema;
 
     /**
      * Constructs a DbService with database "db" and jdbcTemplate initialization
      * @param jdbcTemplate the jdbcTemplate instance through which queries to the database will be executed
      * @exception org.springframework.dao.DataAccessException while sql query execution in getTables()
      */
-    public DbService(JdbcTemplate jdbcTemplate, String dbName) {
+    public DbService(JdbcTemplate jdbcTemplate, String dbName, String schema) {
         this.jdbcTemplate = jdbcTemplate;
         db = new Database(dbName, null);
+        this.schema = schema;
     }
 
     /**
      * Retrieves the entire database structure
      */
     public void configure(){
-        //db.setDb_name(getDbName());
         db.setTables(getTables());
     }
 
@@ -36,16 +37,6 @@ public class DbService {
         return db;
     }
 
-//    /**
-//     * @return database name obtained by jdbcTemplate query
-//     */
-//    private String getDbName(){
-//            return jdbcTemplate.queryForObject(
-//                            "SELECT current_database();",
-//                    (rs, rn) -> rs.getString("current_database")
-//            );
-//    }
-
     /**
      * Gets all tables with their internal structure
      * @return List of configured Tables with their entire structure
@@ -54,8 +45,9 @@ public class DbService {
         LinkedList<Table> tables = new LinkedList<>(jdbcTemplate.query(
                 "SELECT table_name\n" +
                         "FROM information_schema.tables\n" +
-                        "WHERE table_schema='rbac';",
-                (rs, rn) -> new Table(rs.getString("table_name"))
+                        "WHERE table_schema= ?;",
+                (rs, rn) -> new Table(rs.getString("table_name")),
+                schema
         ));
 
         tables.forEach(table -> {
