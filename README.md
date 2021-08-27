@@ -13,11 +13,11 @@ You should change `application.yaml` config params
 Execute `./mvnw package -Dmaven.test.skip=true` terminal command in repository root folder
   
   
-**[only for macOS]**: you can find the built `db-parser-0.0.1.jar`  in the `examples` folder 
+**[only for macOS]**: you can find the built `db-parser-0.0.2.jar`  in the `examples` folder 
   
 
 ## Run
-Execute `java -jar db-parser-0.0.1.jar` command near the `.jar` file
+Execute `java -jar db-parser-0.0.2.jar` terminal command near the `.jar` file
   
   
 ## Result
