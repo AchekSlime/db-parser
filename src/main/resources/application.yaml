@@ -5,4 +5,12 @@ spring:
       username: achek
       password: impsstabb
 serializer:
-  path: "${spring.datasource.db_name}_db_structure"
+  pathJson: "${spring.datasource.db_name}_db_structure.json"
+  pathPlantuml: "${spring.datasource.db_name}_db_structure.png"
+  umlInit : "@startuml\nleft to right direction\n
+            !define foreign_key(x) <color:#aaaaaa><&key></color> x\n
+            !define primary_key(x) <b><color:#b8861b><&key></color> x<b>\n
+            !define column(x) <color:#000000><&media-record></color> x\n
+            !define heap_column(x) <color:#808080><&media-record></color> x\n
+            !define table(x) entity x << (T, white) >>
+            \n\n"

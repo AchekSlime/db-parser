@@ -66,7 +66,15 @@ public class DbService {
             table.setColumns(getColumns(table.getTable_name()));
             // Setting comments for each column in current table.
             table.getColumns().forEach(column -> column.setColumn_comment(columnComments.get(column.getColumn_name())));
-            table.setForeignKeys(getForeignKeys(table.getTable_name()));
+            LinkedList<ForeignKey> fk = getForeignKeys(table.getTable_name());
+            table.setForeignKeys(fk);
+
+            fk.forEach(fKey ->
+                    table.getColumns().stream()
+                            .filter(column -> fKey.getColumn_name().equals(column.getColumn_name())).findFirst()
+                            .ifPresent(targetColumn -> targetColumn.setConstraints(
+                                    (targetColumn.getConstraints() == null ? "" : targetColumn.getConstraints()) + "f")
+                            ));
         });
 
         return tables;
@@ -97,13 +105,22 @@ public class DbService {
      * @return column List for requested table
      */
     private LinkedList<Column> getColumns(String table_name) {
-        return new LinkedList<>(jdbcTemplate.query(
+        LinkedList<Column> columns = new LinkedList<>(jdbcTemplate.query(
                 "SELECT column_name, data_type\n" +
                         "FROM information_schema.columns\n" +
                         "WHERE table_name = ?;",
                 (rs, rn) -> new Column(rs.getString("column_name"), rs.getString("data_type")),
                 table_name)
         );
+        LinkedList<Constraint> constraints = getConstraints(table_name);
+        constraints.forEach(constraint ->
+            columns.stream()
+                    .filter(column -> constraint.getColumn_name().equals(column.getColumn_name())).findFirst()
+                    .ifPresent(targetColumn -> targetColumn.setConstraints(
+                            (targetColumn.getConstraints() == null ? "" : targetColumn.getConstraints()) + constraint.getConstraint()
+                    ))
+        );
+        return columns;
     }
 
     /**
@@ -134,7 +151,7 @@ public class DbService {
      */
     private LinkedList<ForeignKey> getForeignKeys(String table_name) {
         return new LinkedList<>(jdbcTemplate.query(
-                "SELECT \n" +
+                "SELECT\n" +
                         "    tc.table_name, \n" +
                         "    kcu.column_name, \n" +
                         "    ccu.table_name AS foreign_table_name,\n" +
@@ -152,5 +169,26 @@ public class DbService {
                         rs.getString("foreign_table_name"), rs.getString("foreign_column_name")),
                 table_name
         ));
+    }
+
+    private LinkedList<Constraint> getConstraints(String table_name){
+        LinkedList<Constraint> constraints = new LinkedList<>();
+        jdbcTemplate.query(
+                "select\n" +
+                        "ccu.column_name,\n" +
+                        "contype\n" +
+                "from \n" +
+                        "pg_constraint pgc\n" +
+                        "join pg_namespace nsp on nsp.oid = pgc.connamespace\n" +
+                        "join pg_class  cls on pgc.conrelid = cls.oid\n" +
+                        "left join information_schema.constraint_column_usage ccu\n" +
+                        "          on pgc.conname = ccu.constraint_name\n" +
+                        "          and nsp.nspname = ccu.constraint_schema\n" +
+                "where contype!='f' and ccu.table_name = ?"+
+                "order by pgc.conname;",
+                (rs, rn) -> constraints.add(new Constraint(rs.getString("column_name"), rs.getString("contype"))),
+                table_name
+        );
+        return constraints;
     }
 }

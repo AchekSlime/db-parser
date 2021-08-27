@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties
 @ConfigurationProperties(prefix = "serializer")
 public class SerializerConfig {
-    private String path;
+    private String pathJson;
+    private String pathPlantuml;
+    private String umlInit;
 }
 

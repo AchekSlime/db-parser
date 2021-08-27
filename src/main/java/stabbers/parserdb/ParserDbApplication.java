@@ -2,29 +2,28 @@ package stabbers.parserdb;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.jdbc.core.JdbcTemplate;
 import stabbers.parserdb.config.DataSourceConfig;
 import stabbers.parserdb.config.SerializerConfig;
-import stabbers.parserdb.serializer.PlantumlSerializer;
+import stabbers.parserdb.serializer.uml.UmlSerializer;
 import stabbers.parserdb.service.DbService;
-import stabbers.parserdb.serializer.JsonSerializer;
+import stabbers.parserdb.serializer.json.JsonSerializer;
 
 @SpringBootApplication
 public class ParserDbApplication implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(ParserDbApplication.class);
     private final JdbcTemplate jdbcTemplate;
-    @Autowired
-    private SerializerConfig sConfig;
-    @Autowired
-    private DataSourceConfig dConfig;
+    private final SerializerConfig serializerConfig;
+    private final DataSourceConfig dataSourceConfig;
 
-    public ParserDbApplication(JdbcTemplate jdbcTemplate) {
+    public ParserDbApplication(JdbcTemplate jdbcTemplate, SerializerConfig serializerConfig, DataSourceConfig dataSourceConfig) {
         this.jdbcTemplate = jdbcTemplate;
+        this.serializerConfig = serializerConfig;
+        this.dataSourceConfig = dataSourceConfig;
     }
 
 
@@ -34,15 +33,22 @@ public class ParserDbApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        /*
+            Маппинг базы данных в сущность
+         */
         // Создаем инстанс класса, который вытянет структуру бд и замапит ее в сущности.
-        DbService dbService = new DbService(jdbcTemplate, dConfig.getDb_name());
+        DbService dbService = new DbService(jdbcTemplate, dataSourceConfig.getDb_name());
         // Подтягиваем всю структуру бд.
         dbService.configure();
 
-        // Сериализуем полученную структуру из сущностей в JSON.
-        JsonSerializer.serialize(dbService.getDb(), sConfig.getPath() + ".json");
-        // Сериализуем в PlantUML
-        PlantumlSerializer.serialize(dbService.getDb(), sConfig.getPath() + "[plant].txt");
+
+        /*
+            Сериализация
+         */
+        // Сериализуем полученную структуру в JSON.
+        JsonSerializer.serialize(serializerConfig.getPathJson(), dbService.getDb());
+        // Генерим диаграму в PlantUML
+        UmlSerializer.serialize( serializerConfig.getPathPlantuml(), dbService.getDb());
 
         log.info("...Serialization is completed...");
     }
