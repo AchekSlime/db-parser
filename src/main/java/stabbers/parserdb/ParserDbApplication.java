@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.jdbc.core.JdbcTemplate;
 import stabbers.parserdb.config.DataSourceConfig;
 import stabbers.parserdb.config.SerializerConfig;
+import stabbers.parserdb.serializer.uml.UmlConverter;
 import stabbers.parserdb.serializer.uml.UmlSerializer;
 import stabbers.parserdb.service.DbService;
 import stabbers.parserdb.serializer.json.JsonSerializer;
@@ -48,7 +49,9 @@ public class ParserDbApplication implements CommandLineRunner {
         // Сериализуем полученную структуру в JSON.
         JsonSerializer.serialize(serializerConfig.getPathJson(), dbService.getDb());
         // Генерим диаграму в PlantUML
-        UmlSerializer.serialize( serializerConfig.getPathPlantuml(), dbService.getDb());
+        //UmlSerializer.serialize( serializerConfig.getPathPlantuml(), dbService.getDb());
+        UmlConverter converter = new UmlConverter();
+        converter.serialize(dbService.getDb(), serializerConfig.getPathPlantuml());
 
         log.info("...Serialization is completed...");
     }

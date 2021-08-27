@@ -4,6 +4,10 @@ import stabbers.parserdb.entity.Column;
 import stabbers.parserdb.entity.Database;
 import stabbers.parserdb.entity.Table;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class UmlConverter {
     private final StringBuilder foreignKeys;
     private static final String umlInit = "@startuml\nleft to right direction\n" +
@@ -67,20 +71,19 @@ public class UmlConverter {
         });
     }
 
-//    public void serialize(Database db, String path) {
-//        try (BufferedWriter bw = new BufferedWriter(new FileWriter(path))) {
-//            bw.write("@startuml\n!theme plain\nleft to right direction\n" +
-//                "!define primary_key(x) <b><color:#b8861b><&key></color> x<b>\n" +
-//                "!define foreign_key(x) <color:#aaaaaa><&key></color> x\n" +
-//                "!define column(x) <color:#000000><&media-record></color> x\n" +
-//                "!define table(x) entity x << (T, white) >> " +
-//                    "\n\n");
-//            bw.write(serializeTables(db));
-//            bw.write(foreignKeys.toString());
-//            bw.write("@enduml");
-//        } catch (IOException ex) {
-//            System.out.println(ex.getMessage());
-//        }
-//        foreignKeys = new StringBuilder();
-//    }
+    public void serialize(Database db, String path) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(path))) {
+            bw.write("@startuml\n!theme plain\nleft to right direction\n" +
+                "!define primary_key(x) <b><color:#b8861b><&key></color> x<b>\n" +
+                "!define foreign_key(x) <color:#aaaaaa><&key></color> x\n" +
+                "!define column(x) <color:#000000><&media-record></color> x\n" +
+                "!define table(x) entity x << (T, white) >> " +
+                    "\n\n");
+            bw.write(serializeTables(db));
+            bw.write(foreignKeys.toString());
+            bw.write("@enduml");
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
 }

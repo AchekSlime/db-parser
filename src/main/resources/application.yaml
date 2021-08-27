@@ -6,7 +6,7 @@ spring:
       password: admin
 serializer:
   pathJson: "${spring.datasource.db_name}_db_structure.json"
-  pathPlantuml: "${spring.datasource.db_name}_db_structure.png"
+  pathPlantuml: "${spring.datasource.db_name}_db_structure.txt"
   umlInit : "@startuml\nleft to right direction\n
             !define foreign_key(x) <color:#aaaaaa><&key></color> x\n
             !define primary_key(x) <b><color:#b8861b><&key></color> x<b>\n
