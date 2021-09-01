@@ -1,7 +1,7 @@
 spring:
   datasource:
       db_name: ib
-      schema_name : rbc
+      schema_name : rbac
       url: jdbc:postgresql://localhost:5432/${spring.datasource.db_name}
       username: postgres
       password: admin

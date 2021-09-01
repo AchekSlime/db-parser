@@ -59,7 +59,7 @@ public class UmlConverter {
                 stb.append(" \"").append(column.getColumn_comment()).append("\"");
             stb.append("\n");
         });
-        return stb.toString();
+        return new String(stb.toString());
     }
 
     /**

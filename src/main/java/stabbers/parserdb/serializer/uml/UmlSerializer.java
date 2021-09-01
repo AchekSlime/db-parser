@@ -1,11 +1,21 @@
 package stabbers.parserdb.serializer.uml;
 
+import net.sourceforge.plantuml.GeneratedImage;
+import net.sourceforge.plantuml.SourceFileReader;
 import net.sourceforge.plantuml.SourceStringReader;
 import stabbers.parserdb.entity.Database;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
+import java.util.List;
 
 public class UmlSerializer {
+
+    public static void serialize(String filePath, Database db){
+        serializeToTxt(filePath, db);
+        serializeToPngFromFile("test-public-meta.txt");
+    }
     /**
      * Serialize database to png diagram
      * @param filePath path to result .png file
@@ -13,8 +23,17 @@ public class UmlSerializer {
      */
     public static void serializeToPng(String filePath, Database db){
         UmlConverter converter = new UmlConverter();
-        try(OutputStream out = new FileOutputStream(filePath)){
+        try(BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(filePath))){
             writePng(out, converter.getString(db));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void serializeToPngFromFile(String filePath){
+        File file = new File(filePath);
+        try {
+            writePngToFile(file);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -27,7 +46,8 @@ public class UmlSerializer {
      */
     public static void serializeToTxt(String filePath, Database db){
         UmlConverter converter = new UmlConverter();
-        try(BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))){
+        try(BufferedWriter writer = new BufferedWriter
+                (new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8));){
             writeTxt(writer, converter.getString(db));
         } catch (IOException e) {
             e.printStackTrace();
@@ -42,6 +62,12 @@ public class UmlSerializer {
     private static void writePng(OutputStream out, String uml) throws IOException {
         SourceStringReader reader = new SourceStringReader(uml);
         reader.generateImage(out);
+    }
+
+    private static void writePngToFile(File file) throws IOException {
+        SourceFileReader reader = new SourceFileReader(file);
+        List<GeneratedImage> list = reader.getGeneratedImages();
+        list.get(0).getPngFile();
     }
 
     /**
