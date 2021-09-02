@@ -7,14 +7,13 @@ import stabbers.parserdb.entity.Database;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedList;
 import java.util.List;
 
 public class UmlSerializer {
 
-    public static void serialize(String filePath, Database db){
-        serializeToTxt(filePath, db);
-        serializeToPngFromFile(filePath);
+    public static void serialize(String filePathTxt, String filePathPng, Database db){
+        serializeToTxt(filePathTxt, db);
+        serializeToPngFromFile(filePathTxt, "png");
     }
     /**
      * Serialize database to png diagram
@@ -30,10 +29,9 @@ public class UmlSerializer {
         }
     }
 
-    public static void serializeToPngFromFile(String filePath){
-        File file = new File(filePath);
+    public static void serializeToPngFromFile(String filePathTxt, String filePathPng){
         try {
-            writePngToFile(file);
+            writePngToFile(new File(filePathTxt), new File(filePathPng));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -47,7 +45,7 @@ public class UmlSerializer {
     public static void serializeToTxt(String filePath, Database db){
         UmlConverter converter = new UmlConverter();
         try(BufferedWriter writer = new BufferedWriter
-                (new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8));){
+                (new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8))){
             writeTxt(writer, converter.getString(db));
         } catch (IOException e) {
             e.printStackTrace();
@@ -64,8 +62,8 @@ public class UmlSerializer {
         reader.generateImage(out);
     }
 
-    private static void writePngToFile(File file) throws IOException {
-        SourceFileReader reader = new SourceFileReader(file);
+    private static void writePngToFile(File fileIn, File fileOut) throws IOException {
+        SourceFileReader reader = new SourceFileReader(fileIn, fileOut, "UTF-8");
         List<GeneratedImage> list = reader.getGeneratedImages();
         list.get(0).getPngFile();
     }

@@ -49,7 +49,7 @@ public class ParserDbApplication implements CommandLineRunner {
         // Сериализуем полученную структуру в JSON.
         JsonSerializer.serialize(serializerConfig.getPathJson(), dbService.getDb());
         // Сериализация в png диаграму
-        UmlSerializer.serialize(serializerConfig.getPathTxt(), dbService.getDb());
+        UmlSerializer.serialize(serializerConfig.getPathTxt(), serializerConfig.getPathPng(), dbService.getDb());
         //UmlSerializer.serializeToPng( serializerConfig.getPathPng(), dbService.getDb());
         // Сериадизация в uml
         //UmlSerializer.serializeToTxt(serializerConfig.getPathTxt(), dbService.getDb());
