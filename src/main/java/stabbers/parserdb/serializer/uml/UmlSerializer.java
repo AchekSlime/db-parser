@@ -14,7 +14,7 @@ public class UmlSerializer {
 
     public static void serialize(String filePath, Database db){
         serializeToTxt(filePath, db);
-        serializeToPngFromFile("test-public-meta.txt");
+        serializeToPngFromFile(filePath);
     }
     /**
      * Serialize database to png diagram
