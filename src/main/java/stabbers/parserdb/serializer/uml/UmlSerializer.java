@@ -63,7 +63,7 @@ public class UmlSerializer {
     }
 
     private static void writePngToFile(File fileIn, File fileOut) throws IOException {
-        SourceFileReader reader = new SourceFileReader(fileIn, fileOut, "UTF-8");
+        SourceFileReader reader = new SourceFileReader(fileIn, null, "UTF-8");
         List<GeneratedImage> list = reader.getGeneratedImages();
         list.get(0).getPngFile();
     }
