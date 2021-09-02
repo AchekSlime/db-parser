@@ -35,7 +35,7 @@ public class UmlConverter {
     private String serializeTables(Database db){
         StringBuilder stb = new StringBuilder();
         db.getTables().forEach(table -> {
-            if(!table.getTable_name().equals("databasechangelog") || !table.getTable_name().equals("databasechangeloglock")){
+            if(!table.getTable_name().equals("databasechangelog") && !table.getTable_name().equals("databasechangeloglock")){
                 stb.append("table( ").append(table.getTable_name()).append(" ) { \n");
                 stb.append(serializeColumns(table));
                 stb.append("  --\n");
