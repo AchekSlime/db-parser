@@ -35,12 +35,14 @@ public class UmlConverter {
     private String serializeTables(Database db){
         StringBuilder stb = new StringBuilder();
         db.getTables().forEach(table -> {
-            stb.append("table( ").append(table.getTable_name()).append(" ) { \n");
-            stb.append(serializeColumns(table));
-            stb.append("  --\n");
-            stb.append("heap_column( table comment ) : ").append(table.getTable_comment()).append("\n");
-            serializeTableFK(table);
-            stb.append("}\n\n");
+            if(!table.getTable_name().equals("databasechangelog") || !table.getTable_name().equals("databasechangeloglock")){
+                stb.append("table( ").append(table.getTable_name()).append(" ) { \n");
+                stb.append(serializeColumns(table));
+                stb.append("  --\n");
+                stb.append("heap_column( table comment ) : ").append(table.getTable_comment()).append("\n");
+                serializeTableFK(table);
+                stb.append("}\n\n");
+            }
         });
         return stb.toString();
     }
