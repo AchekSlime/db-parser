@@ -8,6 +8,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class Database {
-    private String db_name;
+    private String dbName;
     private List<Table> tables;
 }

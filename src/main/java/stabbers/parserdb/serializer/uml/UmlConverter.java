@@ -6,15 +6,10 @@ import stabbers.parserdb.entity.Table;
 
 public class UmlConverter {
     private final StringBuilder foreignKeys;
-    private static final String umlInit = "@startuml\nleft to right direction\n" +
-                "!define foreign_key(x) <color:#aaaaaa><&key></color> x\n" +
-                "!define primary_key(x) <b><color:#b8861b><&key></color> x<b>\n" +
-                "!define column(x) <color:#000000><&media-record></color> x\n" +
-                "!define heap_column(x) <color:#808080><&media-record></color> x\n" +
-                "!define table(x) entity x << (T, white) >> " +
-                "\n\n";
+    private final String umlInit;
 
-    public UmlConverter(){
+    public UmlConverter(String umlInitConfig){
+        this.umlInit = umlInitConfig;
         foreignKeys = new StringBuilder();
     }
 
@@ -35,13 +30,13 @@ public class UmlConverter {
     private String serializeTables(Database db){
         StringBuilder stb = new StringBuilder();
         db.getTables().forEach(table -> {
-            if(!table.getTable_name().equals("databasechangelog") && !table.getTable_name().equals("databasechangeloglock")){
-                stb.append("table( ").append(table.getTable_name()).append(" ) { \n");
+            if(!table.getTableName().equals("databasechangelog") && !table.getTableName().equals("databasechangeloglock")){
+                stb.append("table( ").append(table.getTableName()).append(" ) {").append(System.lineSeparator());
                 stb.append(serializeColumns(table));
-                stb.append("  --\n");
-                stb.append("heap_column( table comment ) : ").append(table.getTable_comment()).append("\n");
+                stb.append("  --").append(System.lineSeparator());
+                stb.append("heap_column( table comment ) : ").append(table.getTableComment()).append(System.lineSeparator());
                 serializeTableFK(table);
-                stb.append("}\n\n");
+                stb.append("}").append(System.lineSeparator()).append(System.lineSeparator());
             }
         });
         return stb.toString();
@@ -56,12 +51,12 @@ public class UmlConverter {
         StringBuilder stb = new StringBuilder();
         String indent = "  ";
         table.getColumns().forEach((column) -> {
-            stb.append(indent).append(getColumnType(column)).append(" : ").append(column.getData_type());
-            if(column.getColumn_comment() != null)
-                stb.append(" \"").append(column.getColumn_comment()).append("\"");
-            stb.append("\n");
+            stb.append(indent).append(getColumnType(column)).append(" : ").append(column.getDataType());
+            if(column.getColumnComment() != null)
+                stb.append(" \"").append(column.getColumnComment()).append("\"");
+            stb.append(System.lineSeparator());
         });
-        return new String(stb.toString());
+        return stb.toString();
     }
 
     /**
@@ -71,13 +66,19 @@ public class UmlConverter {
      */
     private String getColumnType(Column column){
         if(column.getConstraints() == null)
-            return "column( " + column.getColumn_name() + " )";
-        else if(column.getConstraints().contains("p"))
-            return "primary_key( " + column.getColumn_name() + " )";
-        else if(column.getConstraints().contains("f"))
-            return "foreign_key( " + column.getColumn_name() + " )";
-        else
-            return "*" + column.getColumn_name();
+            return "column( " + column.getColumnName() + " )";
+        else {
+            if (column.getConstraints().contains("u")){
+                // ToDo отрисовать.
+            }
+            if (column.getConstraints().contains("p"))
+                return "primary_key( " + column.getColumnName() + " )";
+            else if(column.getConstraints().contains("f"))
+                return "foreign_key( " + column.getColumnName() + " )";
+            else
+                return "*" + column.getColumnName();
+        }
+
     }
 
     /**
@@ -86,10 +87,10 @@ public class UmlConverter {
      */
     private void serializeTableFK(Table table){
         table.getForeignKeys().forEach(fk -> {
-            foreignKeys.append(fk.getTable_name()).append("::").append(fk.getColumn_name());
+            foreignKeys.append(fk.getTableName()).append("::").append(fk.getColumnName());
             foreignKeys.append(" }o--|| ");
-            foreignKeys.append(fk.getForeign_table_name()).append("::").append(fk.getForeign_column_name()).append(" : ").append(fk.getColumn_name());
-            foreignKeys.append("\n");
+            foreignKeys.append(fk.getForeignTableName()).append("::").append(fk.getForeignColumnName()).append(" : ").append(fk.getColumnName());
+            foreignKeys.append(System.lineSeparator());
         });
     }
 }

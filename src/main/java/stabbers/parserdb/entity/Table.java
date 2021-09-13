@@ -10,8 +10,8 @@ import java.util.List;
 @Setter
 @JsonPropertyOrder({ "table_name", "table_comment", "columns", "foreignKeys" })
 public class Table {
-    private final String table_name;
-    private String table_comment;
+    private final String tableName;
+    private String tableComment;
     private List<Column> columns;
     private List<ForeignKey> foreignKeys;
 }

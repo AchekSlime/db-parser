@@ -2,11 +2,13 @@ package stabbers.parserdb.entity;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class Column {
-    private final String column_name;
-    private final String data_type;
-    private String constraints;
-    private String column_comment;
+    private final String columnName;
+    private final String dataType;
+    private List<String> constraints;
+    private String columnComment;
 
 }

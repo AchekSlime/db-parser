@@ -6,6 +6,8 @@ import stabbers.parserdb.entity.*;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.AbstractMap;
 
 public class DbService {
     private final JdbcTemplate jdbcTemplate;
@@ -14,8 +16,9 @@ public class DbService {
 
     /**
      * Constructs a DbService with database "db" and jdbcTemplate initialization
+     *
      * @param jdbcTemplate the jdbcTemplate instance through which queries to the database will be executed
-     * @exception org.springframework.dao.DataAccessException while sql query execution in getTables()
+     * @throws org.springframework.dao.DataAccessException while sql query execution in getTables()
      */
     public DbService(JdbcTemplate jdbcTemplate, String dbName, String schema) {
         this.jdbcTemplate = jdbcTemplate;
@@ -26,23 +29,24 @@ public class DbService {
     /**
      * Retrieves the entire database structure
      */
-    public void configure(){
+    public void configure() {
         db.setTables(getTables());
     }
 
     /**
      * @return configured database instance with all entire structure
      */
-    public Database getDb(){
+    public Database getDb() {
         return db;
     }
 
     /**
      * Gets all tables with their internal structure
+     *
      * @return List of configured Tables with their entire structure
      */
-    private LinkedList<Table> getTables() {
-        LinkedList<Table> tables = new LinkedList<>(jdbcTemplate.query(
+    private List<Table> getTables() {
+        List<Table> tables = new LinkedList<>(jdbcTemplate.query(
                 "SELECT table_name\n" +
                         "FROM information_schema.tables\n" +
                         "WHERE table_schema= ?;",
@@ -52,21 +56,25 @@ public class DbService {
 
         tables.forEach(table -> {
             // Getting all the commented columns in current Table.
-            HashMap<String, String> columnComments = getColumnComments(table.getTable_name());
+            HashMap<String, String> columnComments = getColumnComments(table.getTableName());
             // Setting the table comment.
-            table.setTable_comment(getTableComment(table.getTable_name()));
-            table.setColumns(getColumns(table.getTable_name()));
+            table.setTableComment(getTableComment(table.getTableName()));
+            table.setColumns(getColumns(table.getTableName()));
             // Setting comments for each column in current table.
-            table.getColumns().forEach(column -> column.setColumn_comment(columnComments.get(column.getColumn_name())));
-            LinkedList<ForeignKey> fk = getForeignKeys(table.getTable_name());
+            table.getColumns().forEach(column -> column.setColumnComment(columnComments.get(column.getColumnName())));
+            // Setting fKeys for each column.
+            List<ForeignKey> fk = getForeignKeys(table.getTableName());
+            // Setting fKeys
             table.setForeignKeys(fk);
 
             fk.forEach(fKey ->
                     table.getColumns().stream()
-                            .filter(column -> fKey.getColumn_name().equals(column.getColumn_name())).findFirst()
-                            .ifPresent(targetColumn -> targetColumn.setConstraints(
-                                    (targetColumn.getConstraints() == null ? "" : targetColumn.getConstraints()) + "f")
-                            ));
+                            .filter(column -> fKey.getColumnName().equals(column.getColumnName())).findFirst()
+                            .ifPresent(targetColumn ->  {
+                                if(targetColumn.getConstraints() == null)
+                                    targetColumn.setConstraints(new LinkedList<>());
+                                targetColumn.getConstraints().add("f");
+                            }));
         });
 
         return tables;
@@ -74,6 +82,7 @@ public class DbService {
 
     /**
      * Gets comment of table
+     *
      * @param table_name name of the requested table
      * @return comment of the requested table
      */
@@ -93,55 +102,61 @@ public class DbService {
 
     /**
      * Gets all columns for requested table
+     *
      * @param table_name name of the requested table
      * @return column List for requested table
      */
-    private LinkedList<Column> getColumns(String table_name) {
-        LinkedList<Column> columns = new LinkedList<>(jdbcTemplate.query(
+    private List<Column> getColumns(String table_name) {
+        List<Column> columns = new LinkedList<>(jdbcTemplate.query(
                 "SELECT column_name, data_type\n" +
                         "FROM information_schema.columns\n" +
                         "WHERE table_name = ?;",
                 (rs, rn) -> new Column(rs.getString("column_name"), rs.getString("data_type")),
                 table_name)
         );
-        LinkedList<Constraint> constraints = getConstraints(table_name);
+        List<Constraint> constraints = getConstraints(table_name);
         constraints.forEach(constraint ->
-            columns.stream()
-                    .filter(column -> constraint.getColumn_name().equals(column.getColumn_name())).findFirst()
-                    .ifPresent(targetColumn -> targetColumn.setConstraints(
-                            (targetColumn.getConstraints() == null ? "" : targetColumn.getConstraints()) + constraint.getConstraint()
-                    ))
+                columns.stream()
+                        .filter(column -> constraint.getColumnName().equals(column.getColumnName())).findFirst()
+                        .ifPresent(targetColumn -> {
+                                if(targetColumn.getConstraints() == null)
+                                    targetColumn.setConstraints(new LinkedList<>());
+                                targetColumn.getConstraints().add(constraint.getConstraint());
+                        }
+                        )
         );
         return columns;
     }
 
     /**
      * Gets all column_comments in the form of Map
+     *
      * @param table_name name of the requested table
      * @return Map<column_name, column_comment></> for requested table
      */
     private HashMap<String, String> getColumnComments(String table_name) {
         HashMap<String, String> comments = new HashMap<>();
-        LinkedList<ColumnComment> commentsList = new LinkedList<>(jdbcTemplate.query(
+        List<AbstractMap.SimpleEntry<String, String>> commentsList = new LinkedList <>(jdbcTemplate.query(
                 "SELECT c.column_name, pgd.description\n" +
                         "FROM pg_catalog.pg_statio_all_tables as st\n" +
                         "  inner join pg_catalog.pg_description pgd on (pgd.objoid=st.relid)\n" +
                         "  inner join information_schema.columns c on (pgd.objsubid=c.ordinal_position\n" +
                         "    and  c.table_schema=st.schemaname and c.table_name=st.relname)\n" +
                         "WHERE c.table_name = ?;",
-                (rs, rn) -> new ColumnComment(rs.getString("column_name"), rs.getString("description")),
+                (rs, rn) -> new AbstractMap.SimpleEntry<>(rs.getString("column_name"), rs.getString("description")),
                 table_name
         ));
-        commentsList.forEach(comment -> comments.put(comment.getColumn_name(), comment.getComment()));
+        commentsList.forEach(comment -> comments.put(comment.getKey(), comment.getValue()));
         return comments;
     }
 
     /**
      * Gets all foreign keys constraints for requested table
+     *
      * @param table_name ame of the requested table
      * @return ForeignKey list with their structure
      */
-    private LinkedList<ForeignKey> getForeignKeys(String table_name) {
+    private List<ForeignKey> getForeignKeys(String table_name) {
         return new LinkedList<>(jdbcTemplate.query(
                 "SELECT\n" +
                         "    tc.table_name, \n" +
@@ -163,24 +178,46 @@ public class DbService {
         ));
     }
 
-    private LinkedList<Constraint> getConstraints(String table_name){
+    private List<Constraint> getConstraints(String table_name) {
         LinkedList<Constraint> constraints = new LinkedList<>();
         jdbcTemplate.query(
                 "select\n" +
                         "ccu.column_name,\n" +
                         "contype\n" +
-                "from \n" +
+                        "from \n" +
                         "pg_constraint pgc\n" +
                         "join pg_namespace nsp on nsp.oid = pgc.connamespace\n" +
                         "join pg_class  cls on pgc.conrelid = cls.oid\n" +
                         "left join information_schema.constraint_column_usage ccu\n" +
                         "          on pgc.conname = ccu.constraint_name\n" +
                         "          and nsp.nspname = ccu.constraint_schema\n" +
-                "where contype!='f' and ccu.table_name = ?"+
-                "order by pgc.conname;",
+                        "where contype!='f' and ccu.table_name = ?" +
+                        "order by pgc.conname;",
                 (rs, rn) -> constraints.add(new Constraint(rs.getString("column_name"), rs.getString("contype"))),
                 table_name
         );
         return constraints;
     }
+
+//    private List<Pair<>> getConstraints2(String table_name) {
+//        LinkedList<Constraint> constraints = new LinkedList<>();
+//        jdbcTemplate.query(
+//                "select\n" +
+//                        "ccu.column_name,\n" +
+//                        "contype\n" +
+//                        "from \n" +
+//                        "pg_constraint pgc\n" +
+//                        "join pg_namespace nsp on nsp.oid = pgc.connamespace\n" +
+//                        "join pg_class  cls on pgc.conrelid = cls.oid\n" +
+//                        "left join information_schema.constraint_column_usage ccu\n" +
+//                        "          on pgc.conname = ccu.constraint_name\n" +
+//                        "          and nsp.nspname = ccu.constraint_schema\n" +
+//                        "where contype!='f' and ccu.table_name = ?" +
+//                        "order by pgc.conname;",
+//                (rs, rn) -> constraints.add()),
+//                table_name
+//        );
+//        return constraints;
+//    }
+
 }
